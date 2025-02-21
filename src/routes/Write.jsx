@@ -16,6 +16,14 @@ const Write = () => {
   const [video, setVideo] = useState("");
   const [progress, setProgress] = useState(0);
 
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      navigate("/login"); // Redirect to login if not signed in
+    }
+  }, [isLoaded, isSignedIn, navigate]);
+
   useEffect(() => {
     img && setValue((prev) => prev + `<p><image src="${img.url}"/></p>`);
   }, [img]);
@@ -26,8 +34,6 @@ const Write = () => {
         (prev) => prev + `<p><iframe class="ql-video" src="${video.url}"/></p>`
       );
   }, [video]);
-
-  const navigate = useNavigate();
 
   const { getToken } = useAuth();
 
@@ -48,10 +54,6 @@ const Write = () => {
 
   if (!isLoaded) {
     return <div className="">Loading...</div>;
-  }
-
-  if (isLoaded && !isSignedIn) {
-    return <div className="">You should login!</div>;
   }
 
   const handleSubmit = (e) => {
