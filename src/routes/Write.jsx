@@ -20,18 +20,18 @@ const Write = () => {
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
-      navigate("/login"); // Redirect to login if not signed in
+      navigate("/login");
     }
   }, [isLoaded, isSignedIn, navigate]);
 
   useEffect(() => {
-    img && setValue((prev) => prev + `<p><image src="${img.url}"/></p>`);
+    img && setValue((prev) => prev + `<p><img src="${img.url}" /></p>`);
   }, [img]);
 
   useEffect(() => {
     video &&
       setValue(
-        (prev) => prev + `<p><iframe class="ql-video" src="${video.url}"/></p>`
+        (prev) => prev + `<p><iframe class="ql-video" src="${video.url}"></iframe></p>`
       );
   }, [video]);
 
@@ -53,7 +53,7 @@ const Write = () => {
   });
 
   if (!isLoaded) {
-    return <div className="">Loading...</div>;
+    return <div>Loading...</div>;
   }
 
   const handleSubmit = (e) => {
@@ -68,44 +68,46 @@ const Write = () => {
       content: value,
     };
 
-    console.log(data);
-
     mutation.mutate(data);
   };
 
   return (
     <div className="h-[calc(100vh-64px)] md:h-[calc(100vh-80px)] flex flex-col gap-6">
       <h1 className="text-cl font-light">Create a New Post</h1>
+
       <form onSubmit={handleSubmit} className="flex flex-col gap-6 flex-1 mb-6">
+        {/* Cover Image Upload */}
         <Upload type="image" setProgress={setProgress} setData={setCover}>
-         <button
-           className={`relative w-max px-4 py-2 font-medium rounded-xl transition-all duration-300 ease-in-out 
-           ${cover ? "bg-green-600 text-white shadow-lg hover:scale-105" : "bg-gray-200 text-gray-700 hover:bg-gray-300"} 
-           ${cover ? "group" : ""}`}
-         >
-           {cover ? "Image Added" : "➕ Add a Cover Image"}
-     
-           {cover && (
-           <span className="absolute inset-0 flex items-center justify-center bg-black/70 text-white text-sm font-light rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-             Change Image
-           </span>
-           )}
-         </button>
+          <button
+            className={`relative w-max px-4 py-2 font-medium rounded-xl transition-all duration-300 ease-in-out 
+            ${cover ? "bg-green-600 text-white shadow-lg hover:scale-105" : "bg-gray-200 text-gray-700 hover:bg-gray-300"} 
+            ${cover ? "group" : ""}`}
+          >
+            {cover ? "Image Added" : "➕ Add a Cover Image"}
+            {cover && (
+              <span className="absolute inset-0 flex items-center justify-center bg-black/70 text-white text-sm font-light rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                Change Image
+              </span>
+            )}
+          </button>
         </Upload>
 
+        {/* Title Input */}
         <input
           className="text-4xl font-semibold bg-transparent outline-none"
           type="text"
           placeholder="My Awesome Story"
           name="title"
         />
+
+        {/* Category Dropdown */}
         <div className="flex items-center gap-4">
-          <label htmlFor="" className="text-sm">
+          <label htmlFor="category" className="text-sm">
             Choose a category:
           </label>
           <select
             name="category"
-            id=""
+            id="category"
             className="p-2 rounded-xl bg-white shadow-md"
           >
             <option value="general">General</option>
@@ -119,31 +121,50 @@ const Write = () => {
             <option value="research">Research</option>
             <option value="successstory">Success Story</option>
             <option value="events">Events</option>
-
           </select>
         </div>
+
+        {/* Description Input */}
         <textarea
           className="p-4 rounded-xl bg-white shadow-md"
           name="desc"
           placeholder="A Short Description"
         />
-        <div className="flex flex-1 ">
-        <div className="flex flex-col gap-1 mr-2 items-end">
-  {/* Image Upload Button */}
-  <Upload type="image" setProgress={setProgress} setData={setImg}>
-    <button className="px-2 py-1 text-gray-500 text-sm bg-gray-50 rounded hover:bg-gray-100 transition-all">
-       [◉"]➕
-    </button>
-  </Upload>
 
-  {/* Video Upload Button */}
-  <Upload type="video" setProgress={setProgress} setData={setVideo}>
-    <button className="px-2 py-1 text-gray-500 text-sm bg-gray-50 rounded hover:bg-gray-100 transition-all">
-       ▷➕
-    </button>
-  </Upload>
-</div>
+        {/* Horizontal Layout: Toolbar + Editor */}
+        <div className="flex gap-4">
+          {/* Floating Toolbar - Horizontal beside editor */}
+          <div className="flex flex-col gap-3 p-3 bg-gray-100 border border-gray-300 rounded-lg shadow-md  h-[120px]">
+            {/* Image Upload Button */}
+            <Upload type="image" setProgress={setProgress} setData={setImg}>
+              <button
+                type="button"
+                className="relative w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full shadow-md 
+                hover:bg-blue-600 transition-all group"
+              >
+                🖼️
+                <span className="absolute left-12 px-2 py-1 text-xs bg-black text-white rounded opacity-0 group-hover:opacity-100">
+                  Insert Image
+                </span>
+              </button>
+            </Upload>
 
+            {/* Video Upload Button */}
+            <Upload type="video" setProgress={setProgress} setData={setVideo}>
+              <button
+                type="button"
+                className="relative w-10 h-10 flex items-center justify-center bg-purple-500 text-white rounded-full shadow-md 
+                hover:bg-purple-600 transition-all group"
+              >
+                🎥
+                <span className="absolute left-12 px-2 py-1 text-xs bg-black text-white rounded opacity-0 group-hover:opacity-100">
+                  Insert Video
+                </span>
+              </button>
+            </Upload>
+          </div>
+
+          {/* Text Editor */}
           <ReactQuill
             theme="snow"
             className="flex-1 rounded-xl bg-white shadow-md"
@@ -152,17 +173,21 @@ const Write = () => {
             readOnly={0 < progress && progress < 100}
           />
         </div>
+
+        {/* Submit Button */}
         <button
           disabled={mutation.isPending || (0 < progress && progress < 100)}
           className="bg-blue-800 text-white font-medium rounded-xl mt-4 p-2 w-36 disabled:bg-blue-400 disabled:cursor-not-allowed"
         >
           {mutation.isPending ? "Loading..." : "Send"}
         </button>
-        {"Progress:" + progress}
-        {/* {mutation.isError && <span>{mutation.error.message}</span>} */}
+
+        {/* Upload Progress */}
+        <span className="text-sm text-gray-500">Progress: {progress}%</span>
       </form>
     </div>
   );
 };
 
 export default Write;
+
